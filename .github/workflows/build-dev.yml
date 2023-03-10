@@ -38,6 +38,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_AMETA_PROD_SECRET_KEY }}
           aws-region: eu-west-2
           
+      - name: change exec
+        run: chmod +x ./gradlew
+          
       - name: Build with Gradle 1/2
         run: ./gradlew clean bootJar
 
