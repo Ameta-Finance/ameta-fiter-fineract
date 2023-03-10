@@ -3,8 +3,8 @@ on:
   # workflow_dispatch:
   push:
     branches:
-      - ameta
-      - staging
+      - master
+      - develop
   pull_request:
     branches:
       - ameta
@@ -34,9 +34,9 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_TEST_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_TEST_SECRET }}
-          aws-region: us-east-2
+          aws-access-key-id: ${{ secrets.AWS_AMETA_PROD_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_AMETA_PROD_SECRET_KEY }}
+          aws-region: eu-west-2
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -49,25 +49,25 @@ jobs:
           context: .
           push: true
           tags: |
-            "916148231619.dkr.ecr.us-east-2.amazonaws.com/fih-server:${{ steps.extract_branch.outputs.branch }}-${{ steps.slug.outputs.sha8 }}"
+            "380935475731.dkr.ecr.eu-west-2.amazonaws.com/fih-server:${{ steps.extract_branch.outputs.branch }}-${{ steps.slug.outputs.sha8 }}"
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_AMETA_PROD_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_AMETA_PROD_SECRET_KEY }}
-          aws-region: eu-west-2
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_AMETA_PROD_ACCESS_KEY }}
+      #     aws-secret-access-key: ${{ secrets.AWS_AMETA_PROD_SECRET_KEY }}
+      #     aws-region: eu-west-2
 
-      - name: Setup Staging EKS Kubectl
-        uses: zachguo/setup-eks-kubectl@v1
-        with:
-          cluster: ameta-prod
-          region: eu-west-2
+      # - name: Setup Staging EKS Kubectl
+      #   uses: zachguo/setup-eks-kubectl@v1
+      #   with:
+      #     cluster: ameta-prod
+      #     region: eu-west-2
 
-      - name: Pull Staging latest images
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: fih-server
-          IMAGE_TAG: "${{ steps.extract_branch.outputs.branch }}-${{ steps.slug.outputs.sha8 }}"
-        run: |
-          kubectl set image deploy/backend-fineract-rest fineract-rest=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -n application
+      # - name: Pull Staging latest images
+      #   env:
+      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #     ECR_REPOSITORY: fih-server
+      #     IMAGE_TAG: "${{ steps.extract_branch.outputs.branch }}-${{ steps.slug.outputs.sha8 }}"
+      #   run: |
+      #     kubectl set image deploy/backend-fineract-rest fineract-rest=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -n application
