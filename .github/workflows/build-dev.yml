@@ -1,4 +1,5 @@
 name: Build Ameta Dev
+on:
   push:
     branches:
       - master
